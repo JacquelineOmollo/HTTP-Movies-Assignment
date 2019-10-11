@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Route } from "react-router-dom";
 import SavedList from "./Movies/SavedList";
 import MovieList from "./Movies/MovieList";
+import UpdateMovie from "./UpdateMovie";
 import Movie from "./Movies/Movie";
 
 const App = () => {
@@ -12,7 +13,7 @@ const App = () => {
   };
 
   return (
-    <>
+    <div>
       <SavedList list={savedList} />
       <Route exact path="/" component={MovieList} />
       <Route
@@ -21,7 +22,19 @@ const App = () => {
           return <Movie {...props} addToSavedList={addToSavedList} />;
         }}
       />
-    </>
+      <Route
+        path="/update-movie/:id"
+        render={props => {
+          return (
+            <UpdateMovie
+              {...props}
+              savedList={savedList}
+              updateMovie={setSavedList}
+            />
+          );
+        }}
+      />
+    </div>
   );
 };
 
