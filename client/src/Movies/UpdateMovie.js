@@ -12,22 +12,32 @@ const initialMovie = {
 const UpdateMovie = props => {
   const [movie, setMovie] = useState(initialMovie);
 
-  const { match, items } = props;
+  // const { match, items } = props;
+
   useEffect(() => {
     setMovie(initialMovie);
-    const movieId = match.params.id;
-    const movieToUpdate = items.find(movie => {
-      console.log(`${movie.id}`, movieId);
-      return `${movie.id}` === movieId;
-    });
+    // const movieId = match.params.id;
+    // const movieToUpdate = items.find(movie => {
+    //   console.log(`${movie.id}`, movieId);
+    // return `${movie.id}` === movieId;
 
-    console.log("movieToUpdate: ", movieToUpdate);
-    if (movieToUpdate) {
-      setMovie(movieToUpdate);
-    }
-    // movie();
-  }, [match, items]);
+    // console.log("movieToUpdate: ", movieToUpdate);
+    // if (movieToUpdate) {
+    //   setMovie(movieToUpdate);
+    // }
+  }, []);
 
+  const handleSubmit = e => {
+    e.preventDefault();
+    axios
+      .put(`http://localhost:5000/api/movies/${movie.id}`, movie)
+      .then(res => {
+        console.log(res);
+        props.updateMovie(res.data);
+        props.history.push("/");
+      })
+      .catch(err => console.log(err.response));
+  };
   const starHandle = index => event => {
     setMovie({
       ...movie,
@@ -45,18 +55,13 @@ const UpdateMovie = props => {
     setMovie({ ...movie, stars: [...movie.stars, ""] });
   };
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    axios
-      .put(`http://localhost:5000/api/movies/${movie.id}`, movie)
-      .then(res => {
-        console.log(res);
-        props.updateMovie(res.data);
-        props.history.push(`/item-list/${movie.id}`);
-        console.log(res);
-      })
-      .catch(err => console.log(err));
-  };
+  // const deleteName = event => {
+  //   event.preventDefault();
+  //   setMovie({ ...movie, stars: [...movie.stars, ""] });
+  // };
+  // if (!movie) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <div>
@@ -81,36 +86,27 @@ const UpdateMovie = props => {
         <div className="baseline" />
 
         {/* <input
-          type="string"
-          name="imageUrl"
-          onChange={changeHandler}
-          placeholder="Image"
-          value={item.imageUrl}
+          type="text"
+          name=" director"
+          onChange={handleChange}
+          placeholder="director"
+          value={movie.director}
         /> */}
         <div className="baseline" />
 
         <input
           type="text"
-          name=" director"
-          onChange={handleChange}
-          placeholder="Director"
-          value={movie.director}
-        />
-        <div className="baseline" />
-
-        <input
-          type="number"
           name="metascore"
           onChange={handleChange}
           placeholder="Metascore"
           value={movie.metascore}
         />
-        {movie.stars.map((Name, index) => {
+        {movie.stars.map((starName, index) => {
           return (
             <input
               type="text"
               placeholder="star"
-              value={Name}
+              value={starName}
               key={index}
               onChange={starHandle(index)}
             />
@@ -118,8 +114,8 @@ const UpdateMovie = props => {
         })}
         <div className="baseline" />
 
+        <button onClick={addName}>Add Star</button>
         <button type="submit">Update</button>
-        <button onClick={addName}>Update</button>
       </form>
     </div>
   );
