@@ -11,33 +11,38 @@ const initialMovie = {
 
 const UpdateMovie = props => {
   const [movie, setMovie] = useState(initialMovie);
-  console.log("me: UpdateMovie.js: UpdateMovie(): props: ", props);
 
-  const { match, data } = props;
+  const { match, items } = props;
   useEffect(() => {
+    setMovie(initialMovie);
     const movieId = match.params.id;
-    const movieToUpdate = movie.find(item => {
-      console.log(`${item.id}`, movieId);
-      return `${item.id}` === movieId;
+    const movieToUpdate = items.find(movie => {
+      console.log(`${movie.id}`, movieId);
+      return `${movie.id}` === movieId;
     });
 
     console.log("movieToUpdate: ", movieToUpdate);
     if (movieToUpdate) {
       setMovie(movieToUpdate);
     }
-  }, [match, data]);
+    // movie();
+  }, [match, items]);
 
-  const changeHandler = event => {
-    event.persist();
-    let value = event.target.value;
-    if (event.target.name === "title") {
-      value = parseInt(value, "");
-    }
-
+  const starHandle = index => event => {
     setMovie({
       ...movie,
-      [event.target.name]: value
+      stars: movie.stars.map((star, starIndex) => {
+        return starIndex === index ? event.target.value : star;
+      })
     });
+  };
+
+  const handleChange = event =>
+    setMovie({ ...movie, [event.target.name]: event.target.value });
+
+  const addName = event => {
+    event.preventDefault();
+    setMovie({ ...movie, stars: [...movie.stars, ""] });
   };
 
   const handleSubmit = e => {
@@ -45,7 +50,8 @@ const UpdateMovie = props => {
     axios
       .put(`http://localhost:5000/api/movies/${movie.id}`, movie)
       .then(res => {
-        props.updateItems(res.data);
+        console.log(res);
+        props.updateMovie(res.data);
         props.history.push(`/item-list/${movie.id}`);
         console.log(res);
       })
@@ -59,7 +65,7 @@ const UpdateMovie = props => {
         <input
           type="number"
           name="id"
-          onChange={changeHandler}
+          onChange={handleChange}
           placeholder="id"
           value={movie.id}
         />
@@ -68,7 +74,7 @@ const UpdateMovie = props => {
         <input
           type="text"
           name="title"
-          onChange={changeHandler}
+          onChange={handleChange}
           placeholder="title"
           value={movie.title}
         />
@@ -86,7 +92,7 @@ const UpdateMovie = props => {
         <input
           type="text"
           name=" director"
-          onChange={changeHandler}
+          onChange={handleChange}
           placeholder="Director"
           value={movie.director}
         />
@@ -95,13 +101,25 @@ const UpdateMovie = props => {
         <input
           type="number"
           name="metascore"
-          onChange={changeHandler}
+          onChange={handleChange}
           placeholder="Metascore"
           value={movie.metascore}
         />
+        {movie.stars.map((Name, index) => {
+          return (
+            <input
+              type="text"
+              placeholder="star"
+              value={Name}
+              key={index}
+              onChange={starHandle(index)}
+            />
+          );
+        })}
         <div className="baseline" />
 
-        <button className="md-button form-button">Update</button>
+        <button type="submit">Update</button>
+        <button onClick={addName}>Update</button>
       </form>
     </div>
   );
