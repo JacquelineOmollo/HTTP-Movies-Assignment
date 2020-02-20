@@ -68,6 +68,12 @@ body {
 
 .home-button {
   padding: 5px 10px;
+}
+.home-button .btn {
+  text-decoration: none;
+  padding: 10px;
+  border: 1px solid black;
+  margin: 10px;
   background-color: lightskyblue;
 }
 
